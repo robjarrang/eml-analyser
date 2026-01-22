@@ -1,9 +1,13 @@
 import DOMPurify from 'dompurify';
 
+export interface SanitizeOptions {
+  allowExternalImages?: boolean;
+}
+
 /**
  * Sanitize HTML email content to prevent XSS and other attacks
  */
-export function sanitizeHtml(html: string): string {
+export function sanitizeHtml(html: string, options: SanitizeOptions = {}): string {
   // Configure DOMPurify with strict settings for email content
   const clean = DOMPurify.sanitize(html, {
     // Forbid dangerous tags
@@ -68,21 +72,25 @@ export function sanitizeHtml(html: string): string {
   });
   
   // Post-process to handle external resources
-  return processExternalResources(clean);
+  return processExternalResources(clean, options);
 }
 
 /**
  * Process external resources in HTML content
  * Replace external images with placeholders and warn about tracking
  */
-function processExternalResources(html: string): string {
-  // Replace external images with a placeholder div
+function processExternalResources(html: string, options: SanitizeOptions = {}): string {
+  // Replace external images with a placeholder div (unless images are allowed)
   // This prevents tracking pixels and malicious resources
   let processed = html.replace(
     /<img\s+[^>]*src\s*=\s*["']?(https?:\/\/[^"'\s>]+)["']?[^>]*>/gi,
     (match, url) => {
       // Keep data: URLs (inline images)
       if (url.startsWith('data:')) {
+        return match;
+      }
+      // If images are allowed, keep the original tag
+      if (options.allowExternalImages) {
         return match;
       }
       // Replace external images with placeholder

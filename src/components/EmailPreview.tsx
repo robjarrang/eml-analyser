@@ -7,7 +7,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Eye, Code, FileText, AlertTriangle, ExternalLink, Shield, Copy, Check } from 'lucide-react';
+import { Eye, Code, FileText, AlertTriangle, ExternalLink, Shield, Copy, Check, ImageIcon } from 'lucide-react';
 import { sanitizeHtml, analyzeContentSafety } from '@/lib/sanitizer';
 import { cn } from '@/lib/utils';
 
@@ -20,16 +20,19 @@ interface EmailPreviewProps {
 export function EmailPreview({ html, text, rawContent }: EmailPreviewProps) {
   const [activeTab, setActiveTab] = useState<string>(html ? 'html' : text ? 'text' : 'raw');
   const [copiedRaw, setCopiedRaw] = useState(false);
+  const [showImages, setShowImages] = useState(false);
   
-  // Sanitize HTML and analyze for safety
-  const { sanitizedHtml, safetyAnalysis } = useMemo(() => {
-    if (!html) return { sanitizedHtml: '', safetyAnalysis: null };
-    
-    const sanitized = sanitizeHtml(html);
-    const analysis = analyzeContentSafety(html);
-    
-    return { sanitizedHtml: sanitized, safetyAnalysis: analysis };
+  // Analyze HTML for safety (always)
+  const safetyAnalysis = useMemo(() => {
+    if (!html) return null;
+    return analyzeContentSafety(html);
   }, [html]);
+  
+  // Sanitize HTML (depends on showImages state)
+  const sanitizedHtml = useMemo(() => {
+    if (!html) return '';
+    return sanitizeHtml(html, { allowExternalImages: showImages });
+  }, [html, showImages]);
   
   const handleCopyRaw = async () => {
     try {
@@ -42,7 +45,7 @@ export function EmailPreview({ html, text, rawContent }: EmailPreviewProps) {
   };
   
   const hasWarnings = safetyAnalysis && (
-    safetyAnalysis.hasExternalImages || 
+    (safetyAnalysis.hasExternalImages && !showImages) || 
     safetyAnalysis.hasTrackingPixels
   );
   
@@ -91,7 +94,7 @@ export function EmailPreview({ html, text, rawContent }: EmailPreviewProps) {
                     <AlertTitle className="text-amber-800 dark:text-amber-200">Content Security Notice</AlertTitle>
                     <AlertDescription className="text-amber-700 dark:text-amber-300 text-sm">
                       <ul className="list-disc list-inside space-y-1 mt-1">
-                        {safetyAnalysis?.hasExternalImages && (
+                        {safetyAnalysis?.hasExternalImages && !showImages && (
                           <li>External images have been blocked for your privacy</li>
                         )}
                         {safetyAnalysis?.hasTrackingPixels && (
@@ -120,6 +123,19 @@ export function EmailPreview({ html, text, rawContent }: EmailPreviewProps) {
                             )}
                           </div>
                         </details>
+                      )}
+                      
+                      {/* Load Images Button */}
+                      {safetyAnalysis?.hasExternalImages && !showImages && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setShowImages(true)}
+                          className="mt-3 bg-white dark:bg-background"
+                        >
+                          <ImageIcon className="w-3.5 h-3.5 mr-1.5" />
+                          Load External Images
+                        </Button>
                       )}
                     </AlertDescription>
                   </Alert>
@@ -174,11 +190,11 @@ export function EmailPreview({ html, text, rawContent }: EmailPreviewProps) {
                   )}
                 </Button>
               </div>
-              <ScrollArea className="flex-1 rounded-md border bg-muted/30">
-                <pre className="p-4 text-xs whitespace-pre-wrap font-mono text-muted-foreground break-all">
-                  {rawContent}
+              <div className="flex-1 rounded-md border bg-muted/30 overflow-auto">
+                <pre className="p-4 text-xs font-mono text-muted-foreground whitespace-pre overflow-x-auto">
+                  <code className="block w-max min-w-full">{rawContent}</code>
                 </pre>
-              </ScrollArea>
+              </div>
             </div>
           </TabsContent>
         </Tabs>
