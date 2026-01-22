@@ -101,7 +101,7 @@ export function HeadersPanel({ headers }: HeadersPanelProps) {
   };
   
   return (
-    <Card>
+    <Card className="overflow-visible">
       <CardHeader className="pb-3">
         <CardTitle className="text-lg flex items-center gap-2">
           <Mail className="w-5 h-5" />
@@ -111,7 +111,7 @@ export function HeadersPanel({ headers }: HeadersPanelProps) {
           {headers.length} headers found in this email
         </CardDescription>
       </CardHeader>
-      <CardContent className="pb-6">
+      <CardContent className="pb-8">
         <Accordion type="multiple" defaultValue={['important']} className="space-y-2">
           {/* Important Headers */}
           <AccordionItem value="important" className="border rounded-lg">
