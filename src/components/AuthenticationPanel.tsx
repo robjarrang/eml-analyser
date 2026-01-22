@@ -1,10 +1,8 @@
 'use client';
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { CheckCircle, XCircle, AlertTriangle, MinusCircle, HelpCircle, Shield, ShieldCheck, ShieldX, ShieldAlert } from 'lucide-react';
+import { CheckCircle, XCircle, AlertTriangle, MinusCircle, HelpCircle, Shield, ShieldCheck, ShieldX, ShieldAlert, ChevronRight } from 'lucide-react';
 import type { AuthenticationResult } from '@/types/email';
 import { cn } from '@/lib/utils';
 
@@ -139,67 +137,69 @@ function OverallStatusBadge({ status }: { status: 'pass' | 'fail' | 'partial' | 
 }
 
 function AuthResultCard({ result }: { result: AuthenticationResult }) {
+  const [isOpen, setIsOpen] = useState(false);
   const config = resultConfig[result.result] || resultConfig.unknown;
   const Icon = config.icon;
-  const methodLabel = methodLabels[result.method] || result.method.toUpperCase();
   const methodDesc = methodDescriptions[result.method] || '';
   
   return (
-    <AccordionItem value={`${result.method}-${result.domain || 'unknown'}`} className="border-0">
-      <div className={cn('rounded-lg border transition-colors', config.bgColor)}>
-        <AccordionTrigger className="px-4 py-3 hover:no-underline data-[state=open]:rounded-b-none">
-          <div className="flex items-center gap-3 w-full">
-            <Icon className={cn('w-5 h-5 shrink-0', config.color)} />
-            <div className="flex-1 text-left">
-              <div className="font-medium text-sm">{result.method.toUpperCase()}</div>
-              {result.domain && (
-                <div className="text-xs text-muted-foreground truncate">{result.domain}</div>
-              )}
-            </div>
-            <Badge variant="secondary" className={cn('ml-auto', config.color)}>
-              {config.label}
-            </Badge>
+    <div className={cn('rounded-lg border transition-colors', config.bgColor)}>
+      <button
+        type="button"
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full px-4 py-3 flex items-center gap-3 text-left hover:bg-black/5 dark:hover:bg-white/5 transition-colors rounded-lg"
+      >
+        <Icon className={cn('w-5 h-5 shrink-0', config.color)} />
+        <div className="flex-1 min-w-0">
+          <div className="font-medium text-sm">{result.method.toUpperCase()}</div>
+          {result.domain && (
+            <div className="text-xs text-muted-foreground truncate">{result.domain}</div>
+          )}
+        </div>
+        <Badge variant="secondary" className={cn('shrink-0', config.color)}>
+          {config.label}
+        </Badge>
+        <ChevronRight className={cn('w-4 h-4 text-muted-foreground transition-transform shrink-0', isOpen && 'rotate-90')} />
+      </button>
+      
+      {isOpen && (
+        <div className="px-4 pb-4 space-y-3">
+          <div>
+            <h4 className="text-xs font-semibold uppercase text-muted-foreground mb-1">
+              What is {result.method.toUpperCase()}?
+            </h4>
+            <p className="text-sm">{methodDesc}</p>
           </div>
-        </AccordionTrigger>
-        <AccordionContent className="px-4 pb-4">
-          <div className="space-y-3 pt-2">
+          
+          <div>
+            <h4 className="text-xs font-semibold uppercase text-muted-foreground mb-1">
+              Result
+            </h4>
+            <p className="text-sm">{config.description}</p>
+          </div>
+          
+          {result.details && (
             <div>
               <h4 className="text-xs font-semibold uppercase text-muted-foreground mb-1">
-                What is {result.method.toUpperCase()}?
+                Details
               </h4>
-              <p className="text-sm">{methodDesc}</p>
+              <p className="text-sm font-mono bg-muted/50 rounded px-2 py-1 break-all">
+                {result.details}
+              </p>
             </div>
-            
+          )}
+          
+          {result.selector && (
             <div>
               <h4 className="text-xs font-semibold uppercase text-muted-foreground mb-1">
-                Result
+                DKIM Selector
               </h4>
-              <p className="text-sm">{config.description}</p>
+              <p className="text-sm font-mono">{result.selector}</p>
             </div>
-            
-            {result.details && (
-              <div>
-                <h4 className="text-xs font-semibold uppercase text-muted-foreground mb-1">
-                  Details
-                </h4>
-                <p className="text-sm font-mono bg-muted/50 rounded px-2 py-1 break-all">
-                  {result.details}
-                </p>
-              </div>
-            )}
-            
-            {result.selector && (
-              <div>
-                <h4 className="text-xs font-semibold uppercase text-muted-foreground mb-1">
-                  DKIM Selector
-                </h4>
-                <p className="text-sm font-mono">{result.selector}</p>
-              </div>
-            )}
-          </div>
-        </AccordionContent>
-      </div>
-    </AccordionItem>
+          )}
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -223,19 +223,20 @@ export function AuthenticationPanel({ results }: AuthenticationPanelProps) {
   });
   
   return (
-    <Card>
-      <CardHeader className="pb-3">
-        <div className="flex items-center justify-between flex-wrap gap-2">
-          <div>
-            <CardTitle className="text-lg">Domain Authentication</CardTitle>
-            <CardDescription>
-              SPF, DKIM, DMARC, and ARC verification results
-            </CardDescription>
-          </div>
-          <OverallStatusBadge status={overallStatus} />
+    <div className="rounded-xl border bg-card text-card-foreground shadow-sm">
+      {/* Header */}
+      <div className="px-6 py-5 border-b flex items-center justify-between flex-wrap gap-2">
+        <div>
+          <h3 className="text-lg font-semibold">Domain Authentication</h3>
+          <p className="text-sm text-muted-foreground mt-1">
+            SPF, DKIM, DMARC, and ARC verification results
+          </p>
         </div>
-      </CardHeader>
-      <CardContent>
+        <OverallStatusBadge status={overallStatus} />
+      </div>
+      
+      {/* Content */}
+      <div className="p-6">
         {results.length === 0 ? (
           <div className="text-center py-8 text-muted-foreground">
             <Shield className="w-12 h-12 mx-auto mb-3 opacity-50" />
@@ -243,20 +244,18 @@ export function AuthenticationPanel({ results }: AuthenticationPanelProps) {
             <p className="text-xs mt-1">This email may not have been authenticated by the sending server.</p>
           </div>
         ) : (
-          <ScrollArea className="max-h-100">
-            <Accordion type="multiple" className="space-y-2">
-              {sortedMethods.map((method) => (
-                groupedResults[method].map((result, index) => (
-                  <AuthResultCard 
-                    key={`${result.method}-${result.domain || index}`} 
-                    result={result} 
-                  />
-                ))
-              ))}
-            </Accordion>
-          </ScrollArea>
+          <div className="space-y-2">
+            {sortedMethods.map((method) => (
+              groupedResults[method].map((result, index) => (
+                <AuthResultCard 
+                  key={`${result.method}-${result.domain || index}`} 
+                  result={result} 
+                />
+              ))
+            ))}
+          </div>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }
