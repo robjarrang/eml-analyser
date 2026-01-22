@@ -103,12 +103,12 @@ export function HeadersPanel({ headers }: HeadersPanelProps) {
   
   const renderHeaderRow = (header: EmailHeader) => (
     <TableRow key={`${header.key}-${header.value.substring(0, 20)}`}>
-      <TableCell className="font-mono text-xs font-medium text-primary w-1/4 align-top py-2">
+      <TableCell className="font-mono text-xs font-medium text-primary align-top py-2 whitespace-nowrap pr-4">
         {header.key}
       </TableCell>
-      <TableCell className="font-mono text-xs break-all py-2">
+      <TableCell className="font-mono text-xs py-2 max-w-0">
         <div className="flex items-start gap-2">
-          <span className="flex-1">{header.value}</span>
+          <span className="flex-1 break-all overflow-hidden">{header.value}</span>
           <Button
             variant="ghost"
             size="sm"
@@ -137,11 +137,11 @@ export function HeadersPanel({ headers }: HeadersPanelProps) {
           {headers.length} headers found in this email
         </CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="overflow-hidden">
         <ScrollArea className="max-h-96">
           <Accordion type="multiple" defaultValue={['important']} className="space-y-2">
             {/* Important Headers */}
-            <AccordionItem value="important" className="border rounded-lg px-4">
+            <AccordionItem value="important" className="border rounded-lg px-4 overflow-hidden">
               <AccordionTrigger className="py-3 hover:no-underline">
                 <div className="flex items-center gap-2">
                   <Badge variant="default" className="bg-primary/10 text-primary hover:bg-primary/10">
@@ -150,24 +150,26 @@ export function HeadersPanel({ headers }: HeadersPanelProps) {
                   <span className="font-medium">Key Headers</span>
                 </div>
               </AccordionTrigger>
-              <AccordionContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="w-1/4">Header</TableHead>
-                      <TableHead>Value</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {importantHeaders.map(renderHeaderRow)}
-                  </TableBody>
-                </Table>
+              <AccordionContent className="overflow-hidden">
+                <div className="overflow-x-auto">
+                  <Table className="table-fixed w-full">
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="w-32">Header</TableHead>
+                        <TableHead>Value</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {importantHeaders.map(renderHeaderRow)}
+                    </TableBody>
+                  </Table>
+                </div>
               </AccordionContent>
             </AccordionItem>
             
             {/* Authentication Headers */}
             {authHeaders.length > 0 && (
-              <AccordionItem value="auth" className="border rounded-lg px-4">
+              <AccordionItem value="auth" className="border rounded-lg px-4 overflow-hidden">
                 <AccordionTrigger className="py-3 hover:no-underline">
                   <div className="flex items-center gap-2">
                     <Badge variant="secondary">
@@ -176,25 +178,27 @@ export function HeadersPanel({ headers }: HeadersPanelProps) {
                     <span className="font-medium">Authentication Headers</span>
                   </div>
                 </AccordionTrigger>
-                <AccordionContent>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead className="w-1/4">Header</TableHead>
-                        <TableHead>Value</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {authHeaders.map(renderHeaderRow)}
-                    </TableBody>
-                  </Table>
+                <AccordionContent className="overflow-hidden">
+                  <div className="overflow-x-auto">
+                    <Table className="table-fixed w-full">
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead className="w-32">Header</TableHead>
+                          <TableHead>Value</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {authHeaders.map(renderHeaderRow)}
+                      </TableBody>
+                    </Table>
+                  </div>
                 </AccordionContent>
               </AccordionItem>
             )}
             
             {/* Other Headers */}
             {otherHeaders.length > 0 && (
-              <AccordionItem value="other" className="border rounded-lg px-4">
+              <AccordionItem value="other" className="border rounded-lg px-4 overflow-hidden">
                 <AccordionTrigger className="py-3 hover:no-underline">
                   <div className="flex items-center gap-2">
                     <Badge variant="outline">
@@ -203,32 +207,36 @@ export function HeadersPanel({ headers }: HeadersPanelProps) {
                     <span className="font-medium">Other Headers</span>
                   </div>
                 </AccordionTrigger>
-                <AccordionContent>
+                <AccordionContent className="overflow-hidden">
                   {showAllHeaders || otherHeaders.length <= 10 ? (
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead className="w-1/4">Header</TableHead>
-                          <TableHead>Value</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {otherHeaders.map(renderHeaderRow)}
-                      </TableBody>
-                    </Table>
-                  ) : (
-                    <>
-                      <Table>
+                    <div className="overflow-x-auto">
+                      <Table className="table-fixed w-full">
                         <TableHeader>
                           <TableRow>
-                            <TableHead className="w-1/4">Header</TableHead>
+                            <TableHead className="w-32">Header</TableHead>
                             <TableHead>Value</TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
-                          {otherHeaders.slice(0, 10).map(renderHeaderRow)}
+                          {otherHeaders.map(renderHeaderRow)}
                         </TableBody>
                       </Table>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="overflow-x-auto">
+                        <Table className="table-fixed w-full">
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead className="w-32">Header</TableHead>
+                              <TableHead>Value</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {otherHeaders.slice(0, 10).map(renderHeaderRow)}
+                          </TableBody>
+                        </Table>
+                      </div>
                       <Button
                         variant="ghost"
                         size="sm"
@@ -324,7 +332,7 @@ export function RoutingPanel({ receivedChain }: RoutingPanelProps) {
       </CardHeader>
       <CardContent>
         <ScrollArea className="max-h-96">
-          <div className="space-y-0">
+          <div className="space-y-0 pl-2">
             {receivedChain.map((hop, index) => {
               const isFirst = index === receivedChain.length - 1;
               const isLast = index === 0;
@@ -338,46 +346,68 @@ export function RoutingPanel({ receivedChain }: RoutingPanelProps) {
                   )}
                   
                   <div className="flex gap-3">
-                    {/* Icon */}
-                    <div className={cn(
-                      'relative z-10 flex items-center justify-center w-8 h-8 rounded-full border-2',
-                      isFirst ? 'bg-green-100 border-green-500 dark:bg-green-950 dark:border-green-600' :
-                      isLast ? 'bg-blue-100 border-blue-500 dark:bg-blue-950 dark:border-blue-600' :
-                      'bg-background border-muted-foreground/30'
-                    )}>
-                      <Server className={cn(
-                        'w-4 h-4',
-                        isFirst ? 'text-green-600 dark:text-green-400' :
-                        isLast ? 'text-blue-600 dark:text-blue-400' :
-                        'text-muted-foreground'
-                      )} />
+                    {/* Icon with integrated label */}
+                    <div className="flex flex-col items-center">
+                      <div className={cn(
+                        'relative z-10 flex items-center justify-center w-8 h-8 rounded-full border-2',
+                        isFirst ? 'bg-green-100 border-green-500 dark:bg-green-950 dark:border-green-600' :
+                        isLast ? 'bg-blue-100 border-blue-500 dark:bg-blue-950 dark:border-blue-600' :
+                        'bg-background border-muted-foreground/30'
+                      )}>
+                        <Server className={cn(
+                          'w-4 h-4',
+                          isFirst ? 'text-green-600 dark:text-green-400' :
+                          isLast ? 'text-blue-600 dark:text-blue-400' :
+                          'text-muted-foreground'
+                        )} />
+                      </div>
                     </div>
                     
                     {/* Content */}
                     <div className="flex-1 pb-4">
-                      <div className="rounded-lg border p-3 bg-card">
+                      {/* Origin/Delivered label above the card */}
+                      {(isFirst || isLast) && (
+                        <div className="mb-1.5">
+                          <Badge 
+                            variant="secondary" 
+                            className={cn(
+                              'text-xs font-medium',
+                              isFirst ? 'bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-300' :
+                              'bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300'
+                            )}
+                          >
+                            {isFirst ? '📤 Origin Server' : '📥 Delivered'}
+                          </Badge>
+                        </div>
+                      )}
+                      
+                      <div className={cn(
+                        'rounded-lg border p-3 bg-card',
+                        isFirst && 'border-green-200 dark:border-green-800',
+                        isLast && 'border-blue-200 dark:border-blue-800'
+                      )}>
                         {/* Server info */}
                         <div className="flex items-start justify-between gap-2 flex-wrap">
-                          <div className="space-y-1">
+                          <div className="space-y-1 min-w-0 flex-1">
                             {hop.by && (
                               <div className="flex items-center gap-1.5">
-                                <span className="text-xs text-muted-foreground font-medium">BY</span>
-                                <span className="font-mono text-sm font-medium truncate max-w-xs">
+                                <span className="text-xs text-muted-foreground font-medium shrink-0">BY</span>
+                                <span className="font-mono text-sm font-medium truncate">
                                   {hop.by}
                                 </span>
                               </div>
                             )}
                             {hop.from && (
                               <div className="flex items-center gap-1.5">
-                                <span className="text-xs text-muted-foreground font-medium">FROM</span>
-                                <span className="font-mono text-xs text-muted-foreground truncate max-w-xs">
+                                <span className="text-xs text-muted-foreground font-medium shrink-0">FROM</span>
+                                <span className="font-mono text-xs text-muted-foreground truncate">
                                   {hop.from}
                                 </span>
                               </div>
                             )}
                           </div>
                           
-                          <div className="flex flex-col items-end gap-1">
+                          <div className="flex flex-col items-end gap-1 shrink-0">
                             {hop.timestamp && (
                               <time className="text-xs text-muted-foreground">
                                 {format(hop.timestamp, 'MMM d, yyyy HH:mm:ss')}
@@ -409,22 +439,6 @@ export function RoutingPanel({ receivedChain }: RoutingPanelProps) {
                       )}
                     </div>
                   </div>
-                  
-                  {/* Labels */}
-                  {(isFirst || isLast) && (
-                    <div className="absolute -left-8 top-2">
-                      <Badge 
-                        variant="secondary" 
-                        className={cn(
-                          'text-xs -rotate-90 origin-right',
-                          isFirst ? 'bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-300' :
-                          'bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300'
-                        )}
-                      >
-                        {isFirst ? 'Origin' : 'Delivered'}
-                      </Badge>
-                    </div>
-                  )}
                 </div>
               );
             })}
