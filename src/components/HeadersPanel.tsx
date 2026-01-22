@@ -5,7 +5,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { 
   Clock, 
@@ -101,31 +100,6 @@ export function HeadersPanel({ headers }: HeadersPanelProps) {
     }
   };
   
-  const renderHeaderRow = (header: EmailHeader) => (
-    <TableRow key={`${header.key}-${header.value.substring(0, 20)}`}>
-      <TableCell className="font-mono text-xs font-medium text-primary align-top py-2 whitespace-nowrap pr-4">
-        {header.key}
-      </TableCell>
-      <TableCell className="font-mono text-xs py-2 max-w-0">
-        <div className="flex items-start gap-2">
-          <span className="flex-1 break-all overflow-hidden">{header.value}</span>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-6 w-6 p-0 shrink-0"
-            onClick={() => handleCopyHeader(header.key, header.value)}
-          >
-            {copiedHeader === header.key ? (
-              <Check className="w-3 h-3 text-green-600" />
-            ) : (
-              <Copy className="w-3 h-3 text-muted-foreground" />
-            )}
-          </Button>
-        </div>
-      </TableCell>
-    </TableRow>
-  );
-  
   return (
     <Card>
       <CardHeader className="pb-3">
@@ -137,124 +111,150 @@ export function HeadersPanel({ headers }: HeadersPanelProps) {
           {headers.length} headers found in this email
         </CardDescription>
       </CardHeader>
-      <CardContent className="overflow-hidden">
-        <ScrollArea className="max-h-96">
-          <Accordion type="multiple" defaultValue={['important']} className="space-y-2 pb-1">
-            {/* Important Headers */}
-            <AccordionItem value="important" className="border rounded-lg px-4 overflow-hidden">
-              <AccordionTrigger className="py-3 hover:no-underline">
+      <CardContent>
+        <Accordion type="multiple" defaultValue={['important']} className="space-y-2">
+          {/* Important Headers */}
+          <AccordionItem value="important" className="border rounded-lg">
+            <AccordionTrigger className="px-4 py-3 hover:no-underline">
+              <div className="flex items-center gap-2">
+                <Badge variant="default" className="bg-primary/10 text-primary hover:bg-primary/10">
+                  {importantHeaders.length}
+                </Badge>
+                <span className="font-medium">Key Headers</span>
+              </div>
+            </AccordionTrigger>
+            <AccordionContent>
+              <div className="px-4 pb-4">
+                <div className="rounded border overflow-hidden">
+                  <table className="w-full text-sm">
+                    <thead className="bg-muted/50">
+                      <tr>
+                        <th className="text-left font-medium px-3 py-2 w-36 border-b">Header</th>
+                        <th className="text-left font-medium px-3 py-2 border-b">Value</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y">
+                      {importantHeaders.map((header, idx) => (
+                        <HeaderRow key={`${header.key}-${idx}`} header={header} onCopy={handleCopyHeader} copiedHeader={copiedHeader} />
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+          
+          {/* Authentication Headers */}
+          {authHeaders.length > 0 && (
+            <AccordionItem value="auth" className="border rounded-lg">
+              <AccordionTrigger className="px-4 py-3 hover:no-underline">
                 <div className="flex items-center gap-2">
-                  <Badge variant="default" className="bg-primary/10 text-primary hover:bg-primary/10">
-                    {importantHeaders.length}
+                  <Badge variant="secondary">
+                    {authHeaders.length}
                   </Badge>
-                  <span className="font-medium">Key Headers</span>
+                  <span className="font-medium">Authentication Headers</span>
                 </div>
               </AccordionTrigger>
-              <AccordionContent className="overflow-hidden pb-4">
-                <div className="overflow-x-auto">
-                  <Table className="table-fixed w-full">
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead className="w-32">Header</TableHead>
-                        <TableHead>Value</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {importantHeaders.map(renderHeaderRow)}
-                    </TableBody>
-                  </Table>
+              <AccordionContent>
+                <div className="px-4 pb-4">
+                  <div className="rounded border overflow-hidden">
+                    <table className="w-full text-sm">
+                      <thead className="bg-muted/50">
+                        <tr>
+                          <th className="text-left font-medium px-3 py-2 w-36 border-b">Header</th>
+                          <th className="text-left font-medium px-3 py-2 border-b">Value</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y">
+                        {authHeaders.map((header, idx) => (
+                          <HeaderRow key={`${header.key}-${idx}`} header={header} onCopy={handleCopyHeader} copiedHeader={copiedHeader} />
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               </AccordionContent>
             </AccordionItem>
-            
-            {/* Authentication Headers */}
-            {authHeaders.length > 0 && (
-              <AccordionItem value="auth" className="border rounded-lg px-4 overflow-hidden">
-                <AccordionTrigger className="py-3 hover:no-underline">
-                  <div className="flex items-center gap-2">
-                    <Badge variant="secondary">
-                      {authHeaders.length}
-                    </Badge>
-                    <span className="font-medium">Authentication Headers</span>
+          )}
+          
+          {/* Other Headers */}
+          {otherHeaders.length > 0 && (
+            <AccordionItem value="other" className="border rounded-lg">
+              <AccordionTrigger className="px-4 py-3 hover:no-underline">
+                <div className="flex items-center gap-2">
+                  <Badge variant="outline">
+                    {otherHeaders.length}
+                  </Badge>
+                  <span className="font-medium">Other Headers</span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent>
+                <div className="px-4 pb-4">
+                  <div className="rounded border overflow-hidden">
+                    <table className="w-full text-sm">
+                      <thead className="bg-muted/50">
+                        <tr>
+                          <th className="text-left font-medium px-3 py-2 w-36 border-b">Header</th>
+                          <th className="text-left font-medium px-3 py-2 border-b">Value</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y">
+                        {(showAllHeaders ? otherHeaders : otherHeaders.slice(0, 10)).map((header, idx) => (
+                          <HeaderRow key={`${header.key}-${idx}`} header={header} onCopy={handleCopyHeader} copiedHeader={copiedHeader} />
+                        ))}
+                      </tbody>
+                    </table>
                   </div>
-                </AccordionTrigger>
-                <AccordionContent className="overflow-hidden pb-4">
-                  <div className="overflow-x-auto">
-                    <Table className="table-fixed w-full">
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead className="w-32">Header</TableHead>
-                          <TableHead>Value</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {authHeaders.map(renderHeaderRow)}
-                      </TableBody>
-                    </Table>
-                  </div>
-                </AccordionContent>
-              </AccordionItem>
-            )}
-            
-            {/* Other Headers */}
-            {otherHeaders.length > 0 && (
-              <AccordionItem value="other" className="border rounded-lg px-4 overflow-hidden">
-                <AccordionTrigger className="py-3 hover:no-underline">
-                  <div className="flex items-center gap-2">
-                    <Badge variant="outline">
-                      {otherHeaders.length}
-                    </Badge>
-                    <span className="font-medium">Other Headers</span>
-                  </div>
-                </AccordionTrigger>
-                <AccordionContent className="overflow-hidden pb-4">
-                  {showAllHeaders || otherHeaders.length <= 10 ? (
-                    <div className="overflow-x-auto">
-                      <Table className="table-fixed w-full">
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead className="w-32">Header</TableHead>
-                            <TableHead>Value</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {otherHeaders.map(renderHeaderRow)}
-                        </TableBody>
-                      </Table>
-                    </div>
-                  ) : (
-                    <>
-                      <div className="overflow-x-auto">
-                        <Table className="table-fixed w-full">
-                          <TableHeader>
-                            <TableRow>
-                              <TableHead className="w-32">Header</TableHead>
-                              <TableHead>Value</TableHead>
-                            </TableRow>
-                          </TableHeader>
-                          <TableBody>
-                            {otherHeaders.slice(0, 10).map(renderHeaderRow)}
-                          </TableBody>
-                        </Table>
-                      </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setShowAllHeaders(true)}
-                        className="w-full mt-2"
-                      >
-                        Show {otherHeaders.length - 10} more headers
-                        <ChevronRight className="w-4 h-4 ml-1" />
-                      </Button>
-                    </>
+                  {!showAllHeaders && otherHeaders.length > 10 && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setShowAllHeaders(true)}
+                      className="w-full mt-3"
+                    >
+                      Show {otherHeaders.length - 10} more headers
+                      <ChevronRight className="w-4 h-4 ml-1" />
+                    </Button>
                   )}
-                </AccordionContent>
-              </AccordionItem>
-            )}
-          </Accordion>
-        </ScrollArea>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          )}
+        </Accordion>
       </CardContent>
     </Card>
+  );
+}
+
+// Extracted HeaderRow component for cleaner code
+function HeaderRow({ header, onCopy, copiedHeader }: { 
+  header: EmailHeader; 
+  onCopy: (key: string, value: string) => void;
+  copiedHeader: string | null;
+}) {
+  return (
+    <tr className="group">
+      <td className="px-3 py-2 align-top">
+        <code className="text-xs font-medium text-primary break-all">{header.key}</code>
+      </td>
+      <td className="px-3 py-2 align-top">
+        <div className="flex items-start gap-2">
+          <code className="text-xs text-muted-foreground break-all flex-1 whitespace-pre-wrap">{header.value}</code>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-6 w-6 p-0 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity"
+            onClick={() => onCopy(header.key, header.value)}
+          >
+            {copiedHeader === header.key ? (
+              <Check className="w-3 h-3 text-green-600" />
+            ) : (
+              <Copy className="w-3 h-3 text-muted-foreground" />
+            )}
+          </Button>
+        </div>
+      </td>
+    </tr>
   );
 }
 
