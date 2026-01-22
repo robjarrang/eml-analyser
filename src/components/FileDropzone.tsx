@@ -134,7 +134,7 @@ export function FileDropzone({ onFileAccepted, onError, isProcessing = false }: 
 
   return (
     <div className="w-full max-w-2xl mx-auto">
-      {/* Main dropzone */}
+      {/* Main dropzone - Jarrang clean style */}
       <div
         onClick={handleClick}
         onKeyDown={handleKeyDown}
@@ -147,21 +147,21 @@ export function FileDropzone({ onFileAccepted, onError, isProcessing = false }: 
         aria-label="Upload EML file"
         className={cn(
           'relative flex flex-col items-center justify-center',
-          'w-full min-h-70 p-8',
-          'border-2 border-dashed rounded-xl',
+          'w-full min-h-70 p-10',
+          'border-2 border-dashed rounded-2xl',
           'transition-all duration-200 ease-in-out',
           'cursor-pointer',
-          'focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2',
+          'focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2',
           isDragActive && !isProcessing && [
-            'border-primary bg-primary/5',
-            'scale-[1.02]',
+            'border-accent bg-accent/5',
+            'scale-[1.01]',
           ],
           !isDragActive && !isProcessing && [
-            'border-muted-foreground/25 hover:border-primary/50',
-            'bg-muted/30 hover:bg-muted/50',
+            'border-border hover:border-accent/50',
+            'bg-card hover:bg-accent/5',
           ],
           isProcessing && [
-            'border-muted-foreground/25 bg-muted/30',
+            'border-border bg-card',
             'cursor-wait',
           ],
           dragError && 'border-destructive/50 bg-destructive/5'
@@ -180,20 +180,20 @@ export function FileDropzone({ onFileAccepted, onError, isProcessing = false }: 
         {/* Icon */}
         <div
           className={cn(
-            'mb-4 p-4 rounded-full',
+            'mb-5 p-5 rounded-2xl',
             'transition-all duration-200',
-            isDragActive ? 'bg-primary/10 scale-110' : 'bg-muted',
+            isDragActive ? 'bg-accent/10 scale-110' : 'bg-secondary',
             isProcessing && 'animate-pulse'
           )}
         >
           {isProcessing ? (
-            <div className="w-10 h-10 border-3 border-primary border-t-transparent rounded-full animate-spin" />
+            <div className="w-10 h-10 border-3 border-accent border-t-transparent rounded-full animate-spin" />
           ) : dragError ? (
             <AlertCircle className="w-10 h-10 text-destructive" />
           ) : isDragActive ? (
-            <Upload className="w-10 h-10 text-primary" />
+            <Upload className="w-10 h-10 text-accent" />
           ) : (
-            <FileText className="w-10 h-10 text-muted-foreground" />
+            <FileText className="w-10 h-10 text-primary" />
           )}
         </div>
 
@@ -201,7 +201,7 @@ export function FileDropzone({ onFileAccepted, onError, isProcessing = false }: 
         <div className="text-center space-y-2">
           {isProcessing ? (
             <>
-              <p className="text-lg font-medium text-foreground">
+              <p className="text-xl font-semibold text-primary">
                 Analyzing email...
               </p>
               <p className="text-sm text-muted-foreground">
@@ -210,7 +210,7 @@ export function FileDropzone({ onFileAccepted, onError, isProcessing = false }: 
             </>
           ) : dragError ? (
             <>
-              <p className="text-lg font-medium text-destructive">
+              <p className="text-xl font-semibold text-destructive">
                 {dragError}
               </p>
               <p className="text-sm text-muted-foreground">
@@ -219,7 +219,7 @@ export function FileDropzone({ onFileAccepted, onError, isProcessing = false }: 
             </>
           ) : isDragActive ? (
             <>
-              <p className="text-lg font-medium text-primary">
+              <p className="text-xl font-semibold text-accent">
                 Drop your file here
               </p>
               <p className="text-sm text-muted-foreground">
@@ -228,13 +228,13 @@ export function FileDropzone({ onFileAccepted, onError, isProcessing = false }: 
             </>
           ) : (
             <>
-              <p className="text-lg font-medium text-foreground">
+              <p className="text-xl font-semibold text-primary">
                 Drop your .eml file here
               </p>
               <p className="text-sm text-muted-foreground">
                 or click to browse your files
               </p>
-              <p className="text-xs text-muted-foreground mt-2">
+              <p className="text-xs text-muted-foreground/70 mt-3">
                 Maximum file size: 50MB
               </p>
             </>
@@ -242,11 +242,11 @@ export function FileDropzone({ onFileAccepted, onError, isProcessing = false }: 
         </div>
       </div>
 
-      {/* Privacy notice */}
-      <div className="mt-4 flex items-center justify-center gap-2 text-sm text-muted-foreground">
-        <Shield className="w-4 h-4 text-green-600" />
-        <span>
-          <strong className="text-green-600">100% Private</strong> — Your file is processed entirely in your browser.
+      {/* Privacy notice - Jarrang style */}
+      <div className="mt-6 flex items-center justify-center gap-2 text-sm">
+        <Shield className="w-4 h-4 text-accent" />
+        <span className="text-muted-foreground">
+          <strong className="text-foreground">100% Private</strong> — Your file is processed entirely in your browser.
           No data is ever sent to any server.
         </span>
       </div>

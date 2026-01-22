@@ -66,17 +66,14 @@ export function EmailAnalyzer() {
   // Show file upload when no analysis
   if (!analysis) {
     return (
-      <div className="min-h-[60vh] flex flex-col items-center justify-center px-4">
-        <div className="text-center mb-8 max-w-xl">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10 mb-4">
-            <Mail className="w-8 h-8 text-primary" />
-          </div>
-          <h1 className="text-3xl font-bold tracking-tight mb-2">
+      <div className="min-h-[70vh] flex flex-col items-center justify-center px-4 py-12">
+        <div className="text-center mb-10 max-w-2xl">
+          <h1 className="text-4xl font-bold tracking-tight mb-4 text-primary">
             EML File Analyzer
           </h1>
-          <p className="text-muted-foreground">
+          <p className="text-lg text-muted-foreground leading-relaxed">
             Upload an .eml file to analyze email headers, authentication records, 
-            routing information, and preview the content—all processed securely in your browser.
+            routing information, and preview content—all processed securely in your browser.
           </p>
         </div>
         
@@ -93,8 +90,8 @@ export function EmailAnalyzer() {
           </Alert>
         )}
         
-        {/* Feature highlights */}
-        <div className="mt-12 grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-3xl">
+        {/* Feature highlights - Jarrang card style */}
+        <div className="mt-16 grid grid-cols-1 sm:grid-cols-3 gap-8 max-w-4xl">
           <FeatureCard
             icon={Shield}
             title="Domain Authentication"
@@ -247,12 +244,12 @@ function FeatureCard({ icon: Icon, title, description }: {
   description: string;
 }) {
   return (
-    <div className="text-center p-4">
-      <div className="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-muted mb-3">
-        <Icon className="w-5 h-5 text-muted-foreground" />
+    <div className="text-center p-6 rounded-xl bg-card border border-border/50 shadow-sm hover:shadow-md transition-shadow">
+      <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-accent/10 mb-4">
+        <Icon className="w-6 h-6 text-accent" />
       </div>
-      <h3 className="font-medium text-sm mb-1">{title}</h3>
-      <p className="text-xs text-muted-foreground">{description}</p>
+      <h3 className="font-semibold text-base mb-2 text-primary">{title}</h3>
+      <p className="text-sm text-muted-foreground leading-relaxed">{description}</p>
     </div>
   );
 }
