@@ -4,7 +4,6 @@ import { useMemo, useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Button } from '@/components/ui/button';
 import { 
   Clock, 
@@ -101,128 +100,126 @@ export function HeadersPanel({ headers }: HeadersPanelProps) {
   };
   
   return (
-    <Card className="overflow-visible">
-      <CardHeader className="pb-3">
-        <CardTitle className="text-lg flex items-center gap-2">
+    <div className="rounded-xl border bg-card text-card-foreground shadow-sm">
+      {/* Header */}
+      <div className="px-6 py-5 border-b">
+        <h3 className="text-lg font-semibold flex items-center gap-2">
           <Mail className="w-5 h-5" />
           Email Headers
-        </CardTitle>
-        <CardDescription>
+        </h3>
+        <p className="text-sm text-muted-foreground mt-1">
           {headers.length} headers found in this email
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="pb-8">
-        <Accordion type="multiple" defaultValue={['important']} className="space-y-2">
+        </p>
+      </div>
+      
+      {/* Content */}
+      <div className="p-6">
+        <div className="space-y-3">
           {/* Important Headers */}
-          <AccordionItem value="important" className="border rounded-lg">
-            <AccordionTrigger className="px-4 py-3 hover:no-underline">
-              <div className="flex items-center gap-2">
-                <Badge variant="default" className="bg-primary/10 text-primary hover:bg-primary/10">
-                  {importantHeaders.length}
-                </Badge>
-                <span className="font-medium">Key Headers</span>
-              </div>
-            </AccordionTrigger>
-            <AccordionContent>
-              <div className="px-4 pb-4">
-                <div className="rounded border overflow-hidden">
-                  <table className="w-full text-sm">
-                    <thead className="bg-muted/50">
-                      <tr>
-                        <th className="text-left font-medium px-3 py-2 w-36 border-b">Header</th>
-                        <th className="text-left font-medium px-3 py-2 border-b">Value</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y">
-                      {importantHeaders.map((header, idx) => (
-                        <HeaderRow key={`${header.key}-${idx}`} header={header} onCopy={handleCopyHeader} copiedHeader={copiedHeader} />
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </AccordionContent>
-          </AccordionItem>
+          <HeaderSection
+            title="Key Headers"
+            badge={<Badge variant="default" className="bg-primary/10 text-primary hover:bg-primary/10">{importantHeaders.length}</Badge>}
+            headers={importantHeaders}
+            onCopy={handleCopyHeader}
+            copiedHeader={copiedHeader}
+            defaultOpen={true}
+          />
           
           {/* Authentication Headers */}
           {authHeaders.length > 0 && (
-            <AccordionItem value="auth" className="border rounded-lg">
-              <AccordionTrigger className="px-4 py-3 hover:no-underline">
-                <div className="flex items-center gap-2">
-                  <Badge variant="secondary">
-                    {authHeaders.length}
-                  </Badge>
-                  <span className="font-medium">Authentication Headers</span>
-                </div>
-              </AccordionTrigger>
-              <AccordionContent>
-                <div className="px-4 pb-4">
-                  <div className="rounded border overflow-hidden">
-                    <table className="w-full text-sm">
-                      <thead className="bg-muted/50">
-                        <tr>
-                          <th className="text-left font-medium px-3 py-2 w-36 border-b">Header</th>
-                          <th className="text-left font-medium px-3 py-2 border-b">Value</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y">
-                        {authHeaders.map((header, idx) => (
-                          <HeaderRow key={`${header.key}-${idx}`} header={header} onCopy={handleCopyHeader} copiedHeader={copiedHeader} />
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </AccordionContent>
-            </AccordionItem>
+            <HeaderSection
+              title="Authentication Headers"
+              badge={<Badge variant="secondary">{authHeaders.length}</Badge>}
+              headers={authHeaders}
+              onCopy={handleCopyHeader}
+              copiedHeader={copiedHeader}
+            />
           )}
           
           {/* Other Headers */}
           {otherHeaders.length > 0 && (
-            <AccordionItem value="other" className="border rounded-lg">
-              <AccordionTrigger className="px-4 py-3 hover:no-underline">
-                <div className="flex items-center gap-2">
-                  <Badge variant="outline">
-                    {otherHeaders.length}
-                  </Badge>
-                  <span className="font-medium">Other Headers</span>
-                </div>
-              </AccordionTrigger>
-              <AccordionContent>
-                <div className="px-4 pb-4">
-                  <div className="rounded border overflow-hidden">
-                    <table className="w-full text-sm">
-                      <thead className="bg-muted/50">
-                        <tr>
-                          <th className="text-left font-medium px-3 py-2 w-36 border-b">Header</th>
-                          <th className="text-left font-medium px-3 py-2 border-b">Value</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y">
-                        {(showAllHeaders ? otherHeaders : otherHeaders.slice(0, 10)).map((header, idx) => (
-                          <HeaderRow key={`${header.key}-${idx}`} header={header} onCopy={handleCopyHeader} copiedHeader={copiedHeader} />
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                  {!showAllHeaders && otherHeaders.length > 10 && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setShowAllHeaders(true)}
-                      className="w-full mt-3"
-                    >
-                      Show {otherHeaders.length - 10} more headers
-                      <ChevronRight className="w-4 h-4 ml-1" />
-                    </Button>
-                  )}
-                </div>
-              </AccordionContent>
-            </AccordionItem>
+            <HeaderSection
+              title="Other Headers"
+              badge={<Badge variant="outline">{otherHeaders.length}</Badge>}
+              headers={showAllHeaders ? otherHeaders : otherHeaders.slice(0, 10)}
+              onCopy={handleCopyHeader}
+              copiedHeader={copiedHeader}
+              footer={
+                !showAllHeaders && otherHeaders.length > 10 ? (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setShowAllHeaders(true)}
+                    className="w-full mt-3"
+                  >
+                    Show {otherHeaders.length - 10} more headers
+                    <ChevronRight className="w-4 h-4 ml-1" />
+                  </Button>
+                ) : null
+              }
+            />
           )}
-        </Accordion>
-      </CardContent>
-    </Card>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Collapsible header section using native details/summary for simplicity
+function HeaderSection({ 
+  title, 
+  badge, 
+  headers, 
+  onCopy, 
+  copiedHeader,
+  defaultOpen = false,
+  footer
+}: { 
+  title: string;
+  badge: React.ReactNode;
+  headers: EmailHeader[];
+  onCopy: (key: string, value: string) => void;
+  copiedHeader: string | null;
+  defaultOpen?: boolean;
+  footer?: React.ReactNode;
+}) {
+  const [isOpen, setIsOpen] = useState(defaultOpen);
+  
+  return (
+    <div className="border rounded-lg">
+      <button
+        type="button"
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-muted/50 transition-colors rounded-lg"
+      >
+        <div className="flex items-center gap-2">
+          {badge}
+          <span className="font-medium">{title}</span>
+        </div>
+        <ChevronRight className={cn("w-4 h-4 text-muted-foreground transition-transform", isOpen && "rotate-90")} />
+      </button>
+      
+      {isOpen && (
+        <div className="px-4 pb-4">
+          <div className="rounded border overflow-hidden">
+            <table className="w-full text-sm">
+              <thead className="bg-muted/50">
+                <tr>
+                  <th className="text-left font-medium px-3 py-2 w-36 border-b">Header</th>
+                  <th className="text-left font-medium px-3 py-2 border-b">Value</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y">
+                {headers.map((header, idx) => (
+                  <HeaderRow key={`${header.key}-${idx}`} header={header} onCopy={onCopy} copiedHeader={copiedHeader} />
+                ))}
+              </tbody>
+            </table>
+          </div>
+          {footer}
+        </div>
+      )}
+    </div>
   );
 }
 
