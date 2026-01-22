@@ -3,7 +3,6 @@
 import { useState, useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -142,12 +141,12 @@ export function EmailPreview({ html, text, rawContent }: EmailPreviewProps) {
                 )}
                 
                 {/* Sandboxed HTML Preview */}
-                <ScrollArea className="flex-1 rounded-md border bg-white">
+                <div className="flex-1 rounded-md border bg-white overflow-auto">
                   <div 
                     className="p-4 prose prose-sm max-w-none dark:prose-invert"
                     dangerouslySetInnerHTML={{ __html: sanitizedHtml }}
                   />
-                </ScrollArea>
+                </div>
               </div>
             ) : (
               <EmptyState message="No HTML content in this email" />
@@ -157,11 +156,11 @@ export function EmailPreview({ html, text, rawContent }: EmailPreviewProps) {
           {/* Plain Text Tab */}
           <TabsContent value="text" className="flex-1 min-h-0 mt-0 data-[state=inactive]:hidden">
             {text ? (
-              <ScrollArea className="h-full rounded-md border bg-muted/30">
+              <div className="h-full rounded-md border bg-muted/30 overflow-auto">
                 <pre className="p-4 text-sm whitespace-pre-wrap font-mono text-foreground">
                   {text}
                 </pre>
-              </ScrollArea>
+              </div>
             ) : (
               <EmptyState message="No plain text content in this email" />
             )}
