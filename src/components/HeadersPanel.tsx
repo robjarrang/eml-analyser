@@ -111,7 +111,7 @@ export function HeadersPanel({ headers }: HeadersPanelProps) {
           {headers.length} headers found in this email
         </CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="pb-6">
         <Accordion type="multiple" defaultValue={['important']} className="space-y-2">
           {/* Important Headers */}
           <AccordionItem value="important" className="border rounded-lg">
