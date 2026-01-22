@@ -287,161 +287,134 @@ export function RoutingPanel({ receivedChain }: RoutingPanelProps) {
     return null;
   }, [receivedChain]);
   
+  // Reverse the chain so origin is at top, destination at bottom (natural reading order)
+  const hops = [...receivedChain].reverse();
+  
   if (receivedChain.length === 0) {
     return (
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-lg flex items-center gap-2">
+      <div className="rounded-xl border bg-card text-card-foreground shadow-sm">
+        <div className="px-6 py-5 border-b">
+          <h3 className="text-lg font-semibold flex items-center gap-2">
             <Globe className="w-5 h-5" />
             Email Routing
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
+          </h3>
+        </div>
+        <div className="p-6">
           <div className="text-center py-8 text-muted-foreground">
             <Server className="w-12 h-12 mx-auto mb-3 opacity-50" />
             <p className="text-sm">No routing information found in this email.</p>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     );
   }
   
   return (
-    <Card>
-      <CardHeader className="pb-3">
-        <div className="flex items-center justify-between flex-wrap gap-2">
-          <div>
-            <CardTitle className="text-lg flex items-center gap-2">
-              <Globe className="w-5 h-5" />
-              Email Routing
-            </CardTitle>
-            <CardDescription>
-              {receivedChain.length} hop{receivedChain.length !== 1 ? 's' : ''} through mail servers
-            </CardDescription>
-          </div>
-          {totalTime && (
-            <Badge variant="outline" className="flex items-center gap-1">
-              <Clock className="w-3 h-3" />
-              Total: {totalTime}
-            </Badge>
-          )}
+    <div className="rounded-xl border bg-card text-card-foreground shadow-sm">
+      {/* Header */}
+      <div className="px-6 py-5 border-b flex items-center justify-between flex-wrap gap-2">
+        <div>
+          <h3 className="text-lg font-semibold flex items-center gap-2">
+            <Globe className="w-5 h-5" />
+            Email Routing
+          </h3>
+          <p className="text-sm text-muted-foreground mt-1">
+            {receivedChain.length} hop{receivedChain.length !== 1 ? 's' : ''} through mail servers
+          </p>
         </div>
-      </CardHeader>
-      <CardContent>
-        <ScrollArea className="max-h-125">
-          <div className="space-y-0 pl-2 pr-2 pb-2">
-            {receivedChain.map((hop, index) => {
-              const isFirst = index === receivedChain.length - 1;
-              const isLast = index === 0;
+        {totalTime && (
+          <Badge variant="outline" className="flex items-center gap-1">
+            <Clock className="w-3 h-3" />
+            {totalTime}
+          </Badge>
+        )}
+      </div>
+      
+      {/* Timeline */}
+      <div className="p-6">
+        <div className="relative">
+          {/* Vertical line connecting all hops */}
+          {hops.length > 1 && (
+            <div className="absolute left-[7px] top-3 bottom-3 w-0.5 bg-gradient-to-b from-green-400 via-border to-blue-400" />
+          )}
+          
+          <div className="space-y-0">
+            {hops.map((hop, index) => {
+              const isOrigin = index === 0;
+              const isDestination = index === hops.length - 1;
               const delay = hop.delay !== undefined ? formatDelay(hop.delay) : null;
               
               return (
-                <div key={index} className={cn("relative", isFirst && "pb-2")}>
-                  {/* Connection line */}
-                  {!isLast && (
-                    <div className="absolute left-4 top-10 bottom-0 w-0.5 bg-border" />
-                  )}
-                  
-                  <div className="flex gap-3">
-                    {/* Icon with integrated label */}
-                    <div className="flex flex-col items-center">
-                      <div className={cn(
-                        'relative z-10 flex items-center justify-center w-8 h-8 rounded-full border-2',
-                        isFirst ? 'bg-green-100 border-green-500 dark:bg-green-950 dark:border-green-600' :
-                        isLast ? 'bg-blue-100 border-blue-500 dark:bg-blue-950 dark:border-blue-600' :
-                        'bg-background border-muted-foreground/30'
-                      )}>
-                        <Server className={cn(
-                          'w-4 h-4',
-                          isFirst ? 'text-green-600 dark:text-green-400' :
-                          isLast ? 'text-blue-600 dark:text-blue-400' :
-                          'text-muted-foreground'
-                        )} />
-                      </div>
-                    </div>
+                <div key={index} className="relative">
+                  {/* Hop row */}
+                  <div className="flex items-start gap-4 py-3">
+                    {/* Timeline dot */}
+                    <div className={cn(
+                      'relative z-10 w-4 h-4 rounded-full border-2 mt-0.5 shrink-0',
+                      isOrigin ? 'bg-green-500 border-green-500' :
+                      isDestination ? 'bg-blue-500 border-blue-500' :
+                      'bg-background border-muted-foreground/40'
+                    )} />
                     
                     {/* Content */}
-                    <div className="flex-1 pb-4">
-                      {/* Origin/Delivered label above the card */}
-                      {(isFirst || isLast) && (
-                        <div className="mb-1.5">
-                          <Badge 
-                            variant="secondary" 
-                            className={cn(
-                              'text-xs font-medium',
-                              isFirst ? 'bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-300' :
-                              'bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300'
-                            )}
-                          >
-                            {isFirst ? '📤 Origin Server' : '📥 Delivered'}
-                          </Badge>
-                        </div>
+                    <div className="flex-1 min-w-0">
+                      {/* Role label for origin/destination */}
+                      {(isOrigin || isDestination) && (
+                        <span className={cn(
+                          'text-xs font-medium mb-1 block',
+                          isOrigin ? 'text-green-600 dark:text-green-400' : 'text-blue-600 dark:text-blue-400'
+                        )}>
+                          {isOrigin ? 'Origin' : 'Delivered'}
+                        </span>
                       )}
                       
-                      <div className={cn(
-                        'rounded-lg border p-3 bg-card',
-                        isFirst && 'border-green-200 dark:border-green-800',
-                        isLast && 'border-blue-200 dark:border-blue-800'
-                      )}>
-                        {/* Server info */}
-                        <div className="flex items-start justify-between gap-2 flex-wrap">
-                          <div className="space-y-1 min-w-0 flex-1">
-                            {hop.by && (
-                              <div className="flex items-center gap-1.5">
-                                <span className="text-xs text-muted-foreground font-medium shrink-0">BY</span>
-                                <span className="font-mono text-sm font-medium truncate">
-                                  {hop.by}
-                                </span>
-                              </div>
-                            )}
-                            {hop.from && (
-                              <div className="flex items-center gap-1.5">
-                                <span className="text-xs text-muted-foreground font-medium shrink-0">FROM</span>
-                                <span className="font-mono text-xs text-muted-foreground truncate">
-                                  {hop.from}
-                                </span>
-                              </div>
-                            )}
-                          </div>
-                          
-                          <div className="flex flex-col items-end gap-1 shrink-0">
-                            {hop.timestamp && (
-                              <time className="text-xs text-muted-foreground">
-                                {format(hop.timestamp, 'MMM d, yyyy HH:mm:ss')}
-                              </time>
-                            )}
-                            {hop.with && (
-                              <Badge variant="outline" className="text-xs">
-                                {hop.with}
-                              </Badge>
-                            )}
-                          </div>
-                        </div>
-                      </div>
+                      {/* Server name */}
+                      <p className="font-mono text-sm font-medium truncate" title={hop.by || hop.from}>
+                        {hop.by || hop.from || 'Unknown server'}
+                      </p>
                       
-                      {/* Delay indicator */}
-                      {delay && !isLast && (
-                        <div className="flex items-center gap-2 mt-2 ml-2">
-                          <ArrowDown className="w-3 h-3 text-muted-foreground" />
-                          <span className={cn(
-                            'text-xs font-medium',
-                            delay.isLong ? 'text-amber-600 dark:text-amber-400' : 'text-muted-foreground'
-                          )}>
-                            {delay.text}
-                            {delay.isLong && (
-                              <AlertTriangle className="w-3 h-3 inline ml-1" />
-                            )}
-                          </span>
-                        </div>
+                      {/* From server (if different) */}
+                      {hop.by && hop.from && (
+                        <p className="font-mono text-xs text-muted-foreground truncate mt-0.5" title={hop.from}>
+                          from {hop.from}
+                        </p>
+                      )}
+                    </div>
+                    
+                    {/* Right side: timestamp and protocol */}
+                    <div className="text-right shrink-0">
+                      {hop.timestamp && (
+                        <time className="text-xs text-muted-foreground block">
+                          {format(hop.timestamp, 'HH:mm:ss')}
+                        </time>
+                      )}
+                      {hop.with && (
+                        <span className="text-xs text-muted-foreground">
+                          {hop.with}
+                        </span>
                       )}
                     </div>
                   </div>
+                  
+                  {/* Delay between hops */}
+                  {delay && !isDestination && (
+                    <div className="flex items-center gap-2 pl-8 pb-1">
+                      <ArrowDown className="w-3 h-3 text-muted-foreground" />
+                      <span className={cn(
+                        'text-xs',
+                        delay.isLong ? 'text-amber-600 dark:text-amber-400 font-medium' : 'text-muted-foreground'
+                      )}>
+                        {delay.text}
+                        {delay.isLong && <AlertTriangle className="w-3 h-3 inline ml-1" />}
+                      </span>
+                    </div>
+                  )}
                 </div>
               );
             })}
           </div>
-        </ScrollArea>
-      </CardContent>
-    </Card>
+        </div>
+      </div>
+    </div>
   );
 }
