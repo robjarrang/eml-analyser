@@ -139,7 +139,7 @@ export function HeadersPanel({ headers }: HeadersPanelProps) {
       </CardHeader>
       <CardContent className="overflow-hidden">
         <ScrollArea className="max-h-96">
-          <Accordion type="multiple" defaultValue={['important']} className="space-y-2">
+          <Accordion type="multiple" defaultValue={['important']} className="space-y-2 pb-1">
             {/* Important Headers */}
             <AccordionItem value="important" className="border rounded-lg px-4 overflow-hidden">
               <AccordionTrigger className="py-3 hover:no-underline">
@@ -150,7 +150,7 @@ export function HeadersPanel({ headers }: HeadersPanelProps) {
                   <span className="font-medium">Key Headers</span>
                 </div>
               </AccordionTrigger>
-              <AccordionContent className="overflow-hidden">
+              <AccordionContent className="overflow-hidden pb-4">
                 <div className="overflow-x-auto">
                   <Table className="table-fixed w-full">
                     <TableHeader>
@@ -178,7 +178,7 @@ export function HeadersPanel({ headers }: HeadersPanelProps) {
                     <span className="font-medium">Authentication Headers</span>
                   </div>
                 </AccordionTrigger>
-                <AccordionContent className="overflow-hidden">
+                <AccordionContent className="overflow-hidden pb-4">
                   <div className="overflow-x-auto">
                     <Table className="table-fixed w-full">
                       <TableHeader>
@@ -207,7 +207,7 @@ export function HeadersPanel({ headers }: HeadersPanelProps) {
                     <span className="font-medium">Other Headers</span>
                   </div>
                 </AccordionTrigger>
-                <AccordionContent className="overflow-hidden">
+                <AccordionContent className="overflow-hidden pb-4">
                   {showAllHeaders || otherHeaders.length <= 10 ? (
                     <div className="overflow-x-auto">
                       <Table className="table-fixed w-full">
@@ -331,15 +331,15 @@ export function RoutingPanel({ receivedChain }: RoutingPanelProps) {
         </div>
       </CardHeader>
       <CardContent>
-        <ScrollArea className="max-h-96">
-          <div className="space-y-0 pl-2">
+        <ScrollArea className="max-h-125">
+          <div className="space-y-0 pl-2 pr-2 pb-2">
             {receivedChain.map((hop, index) => {
               const isFirst = index === receivedChain.length - 1;
               const isLast = index === 0;
               const delay = hop.delay !== undefined ? formatDelay(hop.delay) : null;
               
               return (
-                <div key={index} className="relative">
+                <div key={index} className={cn("relative", isFirst && "pb-2")}>
                   {/* Connection line */}
                   {!isLast && (
                     <div className="absolute left-4 top-10 bottom-0 w-0.5 bg-border" />
